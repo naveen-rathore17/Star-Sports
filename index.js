@@ -24,14 +24,14 @@ async function fetchNewToken(ch) {
   if (ch == 1) {
 
     streams[1] =
-      "https://n3.zohanayaan.com:1686/hls/willowusa.m3u8?md5=4KkqJsdrnNBy56jASHZYWg&expires=1775561356";
+      "https://n3.zohanayaan.com:1686/hls/willowusa.m3u8?md5=qIukgrmvGlLyGvie6yM1Fw&expires=1775566418";
 
   }
 
   if (ch == 2) {
 
     streams[2] =
-      "https://n3.zohanayaan.com:1686/hls/starhindi.m3u8?md5=DsByKBY12Bp4Cx80PHemTQ&expires=1775563899";
+      "https://n5.zohanayaan.com:1686/hls/starhindi.m3u8?md5=X4VJh71CQx4vy1vSF1oP5Q&expires=1775566481";
 
   }
   if (ch == 3) {
