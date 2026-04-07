@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>SixStorm Live</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+
+</head>
+
+
+<body class="bg-gradient-to-br from-[#0f172a] via-[#020617] to-[#111827] min-h-screen flex flex-col text-white">
+
+<!-- NAVBAR -->
+
+<nav class="bg-[#020617]/80 backdrop-blur-xl border-b border-white/10 sticky top-0 z-50 shadow-xl">
+<div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
+
+<a href="/" class="text-2xl md:text-3xl font-bold">
+<span class="bg-gradient-to-r from-yellow-400 via-yellow-300 to-orange-500 bg-clip-text text-transparent">Six</span>
+<span class="text-white">Storm</span>
+</a>
+
+<div class="flex gap-4 text-xs md:text-base font-semibold">
+
+<a href="https://sixstorm-live.onrender.com/help" class="hover:text-red-400 transition">
+Help
+</a>
+
+<a href="https://sixstorm-live.onrender.com/cricket-news" class="hover:text-red-400 transition">
+Updates
+</a>
+
+<a href="https://sixstorm-live.onrender.com/contact-us" class="hover:text-red-400 transition">
+Contact
+</a>
+
+</div>
+
+</div>
+</nav>
+
+
+<main class="flex-grow">
+
+<div class="text-center mt-8 px-4">
+
+<h1 class="text-2xl md:text-5xl font-bold">
+🏏 Live Cricket Streaming
+</h1>
+
+<p class="text-gray-400 mt-2 text-sm">
+Watch cricket match live in HD
+</p>
+
+<p class="text-xs text-gray-400 mt-3">
+Streams are provided by third-party sources. We do not host any content.
+</p>
+
+</div>
+
+
+<div class="max-w-7xl mx-auto px-4 py-6">
+
+<div id="container"
+class="relative w-full aspect-video bg-black rounded-xl overflow-hidden shadow-2xl border border-white/10">
+
+
+<!-- LOADER -->
+
+<div id="loader"
+class="absolute inset-0 flex items-center justify-center bg-black/70 z-10">
+
+<div class="animate-spin rounded-full h-16 w-16 border-4 border-white border-t-transparent"></div>
+
+</div>
+
+
+<video
+id="video"
+class="w-full h-full object-contain"
+controls
+autoplay
+muted
+playsinline
+></video>
+
+
+</div>
+
+</div>
+
+</main>
+
+
+<script>
+
+/* =========================
+ANTI EMBED PROTECTION
+========================= */
+
+if (window.self !== window.top) {
+
+document.body.innerHTML = `
+<div style="
+position:fixed;
+inset:0;
+display:flex;
+align-items:center;
+justify-content:center;
+background:#000;
+color:white;
+font-size:22px;
+font-weight:bold;">
+Embedding not allowed
+</div>
+`;
+
+throw new Error("Embed blocked")
+
+}
+
+
+/* =========================
+PLAYER START
+========================= */
+var video = document.getElementById("video");
+var loader = document.getElementById("loader");
+
+var src = "/stream.m3u8";
+
+let hls;
+
+function startPlayer(){
+
+if(Hls.isSupported()){
+
+if(hls){
+hls.destroy();
+}
+
+hls = new Hls({
+
+liveSyncDurationCount:3,
+maxBufferLength:30,
+maxMaxBufferLength:60,
+backBufferLength:30,
+enableWorker:true,
+lowLatencyMode:true,
+
+fragLoadingTimeOut:20000,
+fragLoadingMaxRetry:6
+
+});
+
+hls.loadSource(src);
+hls.attachMedia(video);
+
+/* manifest loaded */
+
+hls.on(Hls.Events.MANIFEST_PARSED,function(){
+
+loader.style.display="none";
+
+video.play().catch(()=>{});
+
+});
+
+/* buffering start */
+
+hls.on(Hls.Events.BUFFER_STALLED,function(){
+
+loader.style.display="flex";
+
+});
+
+/* buffering recovered */
+
+hls.on(Hls.Events.FRAG_BUFFERED,function(){
+
+loader.style.display="none";
+
+});
+
+/* error handling */
+
+hls.on(Hls.Events.ERROR,function(event,data){
+
+if(data.fatal){
+
+console.log("Fatal error restart player");
+
+setTimeout(()=>{
+
+startPlayer();
+
+},2000);
+
+}
+
+});
+
+}
+
+else if(video.canPlayType('application/vnd.apple.mpegurl')){
+
+video.src = src;
+
+video.addEventListener('loadedmetadata',function(){
+
+loader.style.display="none";
+
+video.play();
+
+});
+
+}
+
+}
+
+startPlayer();
+
+/* =========================
+TOKEN REFRESH
+========================= */
+
+setInterval(()=>{
+
+location.reload();
+
+},1000*60*20);
+
+
+
+/* =========================
+RIGHT CLICK BLOCK
+========================= */
+
+document.addEventListener("contextmenu",function(e){
+e.preventDefault();
+});
+
+
+/* =========================
+KEYBOARD SHORTCUT BLOCK
+========================= */
+
+document.addEventListener("keydown",function(e){
+
+const key = e.key.toLowerCase();
+
+if(e.key==="F12") e.preventDefault();
+if(e.ctrlKey && key==="u") e.preventDefault();
+if(e.ctrlKey && e.shiftKey && key==="i") e.preventDefault();
+if(e.ctrlKey && e.shiftKey && key==="j") e.preventDefault();
+if(e.ctrlKey && e.shiftKey && key==="c") e.preventDefault();
+
+});
+
+
+/* =========================
+DEVTOOLS DETECT
+========================= */
+
+(function(){
+
+const REDIRECT_URL = "/";
+
+let devtoolsOpen=false;
+
+setInterval(function(){
+
+const width = window.outerWidth - window.innerWidth > 160;
+const height = window.outerHeight - window.innerHeight > 160;
+
+if(width || height){
+triggerRedirect();
+}
+
+},2000);
+
+function triggerRedirect(){
+
+if(devtoolsOpen) return;
+
+devtoolsOpen=true;
+
+document.body.innerHTML=`
+<div style="
+height:100vh;
+display:flex;
+align-items:center;
+justify-content:center;
+background:black;
+color:white;
+font-size:24px;
+font-weight:bold;">
+⚠ Developer Tools Detected
+</div>
+`;
+
+setTimeout(()=>{
+
+window.location.replace(REDIRECT_URL);
+
+},1000);
+
+}
+
+})();
+
+
+/* =========================
+DEBUGGER TRAP
+========================= */
+
+(function(){
+
+function trap(){
+
+debugger;
+
+setTimeout(trap,2000);
+
+}
+
+trap();
+
+})();
+
+
+/* =========================
+CONSOLE BLOCK
+========================= */
+
+console.log=function(){};
+console.warn=function(){};
+console.error=function(){};
+
+</script>
+
+
+</body>
+</html>
