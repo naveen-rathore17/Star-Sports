@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require("express");
 const axios = require("axios");
 
@@ -24,20 +25,20 @@ async function fetchNewToken(ch) {
   if (ch == 1) {
 
     streams[1] =
-      "https://n3.zohanayaan.com:1686/hls/willowusa.m3u8?md5=qIukgrmvGlLyGvie6yM1Fw&expires=1775566418";
+      process.env.willow;
 
   }
 
   if (ch == 2) {
 
     streams[2] =
-      "https://n5.zohanayaan.com:1686/hls/starhindi.m3u8?md5=X4VJh71CQx4vy1vSF1oP5Q&expires=1775566481";
+      process.env.Hindi;
 
   }
   if (ch == 3) {
 
     streams[3] =
-      "https://n3.zohanayaan.com:1686/hls/star1in.m3u8?md5=ADHJGno5ILUB041ROLmARg&expires=1775564032";
+      process.env.English;
 
   }
 
