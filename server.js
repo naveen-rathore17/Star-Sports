@@ -19,7 +19,7 @@ async function fetchNewToken() {
   // yaha tum scraper laga sakte ho
 
   currentStream =
-    "https://n3.zohanayaan.com:1686/hls/starhindi.m3u8?md5=iUgp8LvDZJFPCC2ooL9u7w&expires=1775555562";
+    "https://n3.zohanayaan.com:1686/hls/willowusa.m3u8?md5=4KkqJsdrnNBy56jASHZYWg&expires=1775561356";
 
   return currentStream;
 
@@ -153,7 +153,7 @@ app.get("/segment", async (req, res) => {
 });
 
 
-app.listen(3001, () => {
+app.listen(3000, () => {
 
   console.log("server running");
 
