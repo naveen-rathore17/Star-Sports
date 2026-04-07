@@ -13,10 +13,7 @@
 
 </head>
 
-
 <body class="bg-gradient-to-br from-[#0f172a] via-[#020617] to-[#111827] min-h-screen flex flex-col text-white">
-
-<!-- NAVBAR -->
 
 <nav class="bg-[#020617]/80 backdrop-blur-xl border-b border-white/10 sticky top-0 z-50 shadow-xl">
 <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
@@ -26,25 +23,8 @@
 <span class="text-white">Storm</span>
 </a>
 
-<div class="flex gap-4 text-xs md:text-base font-semibold">
-
-<a href="https://sixstorm-live.onrender.com/help" class="hover:text-red-400 transition">
-Help
-</a>
-
-<a href="https://sixstorm-live.onrender.com/cricket-news" class="hover:text-red-400 transition">
-Updates
-</a>
-
-<a href="https://sixstorm-live.onrender.com/contact-us" class="hover:text-red-400 transition">
-Contact
-</a>
-
-</div>
-
 </div>
 </nav>
-
 
 <main class="flex-grow">
 
@@ -58,20 +38,12 @@ Contact
 Watch cricket match live in HD
 </p>
 
-<p class="text-xs text-gray-400 mt-3">
-Streams are provided by third-party sources. We do not host any content.
-</p>
-
 </div>
-
 
 <div class="max-w-7xl mx-auto px-4 py-6">
 
 <div id="container"
 class="relative w-full aspect-video bg-black rounded-xl overflow-hidden shadow-2xl border border-white/10">
-
-
-<!-- LOADER -->
 
 <div id="loader"
 class="absolute inset-0 flex items-center justify-center bg-black/70 z-10">
@@ -79,7 +51,6 @@ class="absolute inset-0 flex items-center justify-center bg-black/70 z-10">
 <div class="animate-spin rounded-full h-16 w-16 border-4 border-white border-t-transparent"></div>
 
 </div>
-
 
 <video
 id="video"
@@ -90,6 +61,24 @@ muted
 playsinline
 ></video>
 
+</div>
+
+<div class="flex justify-center gap-6 mt-6">
+
+<button onclick="changeChannel(1)"
+class="px-6 py-2 rounded-full bg-red-600 hover:bg-red-700 font-bold">
+Server 1
+</button>
+
+<button onclick="changeChannel(2)"
+class="px-6 py-2 rounded-full bg-blue-600 hover:bg-blue-700 font-bold">
+Server 2
+</button>
+
+<button onclick="changeChannel(3)"
+class="px-6 py-2 rounded-full bg-blue-600 hover:bg-blue-700 font-bold">
+Server 3
+</button>
 
 </div>
 
@@ -97,42 +86,13 @@ playsinline
 
 </main>
 
-
 <script>
 
-/* =========================
-ANTI EMBED PROTECTION
-========================= */
-
-if (window.self !== window.top) {
-
-document.body.innerHTML = `
-<div style="
-position:fixed;
-inset:0;
-display:flex;
-align-items:center;
-justify-content:center;
-background:#000;
-color:white;
-font-size:22px;
-font-weight:bold;">
-Embedding not allowed
-</div>
-`;
-
-throw new Error("Embed blocked")
-
-}
-
-
-/* =========================
-PLAYER START
-========================= */
 var video = document.getElementById("video");
 var loader = document.getElementById("loader");
 
-var src = "/stream.m3u8";
+var channel = 1;
+var src = "/stream.m3u8?ch=1";
 
 let hls;
 
@@ -144,24 +104,10 @@ if(hls){
 hls.destroy();
 }
 
-hls = new Hls({
-
-liveSyncDurationCount:3,
-maxBufferLength:30,
-maxMaxBufferLength:60,
-backBufferLength:30,
-enableWorker:true,
-lowLatencyMode:true,
-
-fragLoadingTimeOut:20000,
-fragLoadingMaxRetry:6
-
-});
+hls = new Hls();
 
 hls.loadSource(src);
 hls.attachMedia(video);
-
-/* manifest loaded */
 
 hls.on(Hls.Events.MANIFEST_PARSED,function(){
 
@@ -171,29 +117,9 @@ video.play().catch(()=>{});
 
 });
 
-/* buffering start */
-
-hls.on(Hls.Events.BUFFER_STALLED,function(){
-
-loader.style.display="flex";
-
-});
-
-/* buffering recovered */
-
-hls.on(Hls.Events.FRAG_BUFFERED,function(){
-
-loader.style.display="none";
-
-});
-
-/* error handling */
-
 hls.on(Hls.Events.ERROR,function(event,data){
 
 if(data.fatal){
-
-console.log("Fatal error restart player");
 
 setTimeout(()=>{
 
@@ -207,38 +133,23 @@ startPlayer();
 
 }
 
-else if(video.canPlayType('application/vnd.apple.mpegurl')){
-
-video.src = src;
-
-video.addEventListener('loadedmetadata',function(){
-
-loader.style.display="none";
-
-video.play();
-
-});
-
 }
+
+function changeChannel(ch){
+
+channel = ch;
+
+src = "/stream.m3u8?ch=" + ch;
+
+loader.style.display="flex";
+
+startPlayer();
 
 }
 
 startPlayer();
 
-/* =========================
-TOKEN REFRESH
-========================= */
-
-setInterval(()=>{
-
-location.reload();
-
-},1000*60*20);
-
-
-
 </script>
-
 
 </body>
 </html>

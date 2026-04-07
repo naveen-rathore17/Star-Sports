@@ -5,26 +5,44 @@ const app = express();
 
 app.set("view engine", "ejs");
 
-let currentStream = "";
+/* STREAM STORAGE */
 
+let streams = {
+  1: "",
+  2: "",
+  3:""
+};
 
 /* -----------------------
 TOKEN FETCH
 ----------------------- */
 
-async function fetchNewToken() {
+async function fetchNewToken(ch) {
 
-  console.log("Fetching new token...");
+  console.log("Fetching new token for channel:", ch);
 
-  // yaha tum scraper laga sakte ho
+  if (ch == 1) {
 
-  currentStream =
-    "https://n3.zohanayaan.com:1686/hls/willowusa.m3u8?md5=4KkqJsdrnNBy56jASHZYWg&expires=1775561356";
+    streams[1] =
+      "https://n3.zohanayaan.com:1686/hls/willowusa.m3u8?md5=4KkqJsdrnNBy56jASHZYWg&expires=1775561356";
 
-  return currentStream;
+  }
 
+  if (ch == 2) {
+
+    streams[2] =
+      "https://n3.zohanayaan.com:1686/hls/starhindi.m3u8?md5=DsByKBY12Bp4Cx80PHemTQ&expires=1775563899";
+
+  }
+  if (ch == 3) {
+
+    streams[3] =
+      "https://n3.zohanayaan.com:1686/hls/star1in.m3u8?md5=ADHJGno5ILUB041ROLmARg&expires=1775564032";
+
+  }
+
+  return streams[ch];
 }
-
 
 /* -----------------------
 CHECK TOKEN EXPIRY
@@ -40,7 +58,7 @@ function tokenExpired(url) {
 
     let expireTime = parseInt(exp[1]) * 1000;
 
-    return Date.now() > expireTime - 30000; // 30 sec before expire
+    return Date.now() > expireTime - 30000;
 
   } catch {
 
@@ -50,34 +68,33 @@ function tokenExpired(url) {
 
 }
 
-
 /* -----------------------
 GET STREAM
 ----------------------- */
 
-async function getStream() {
+async function getStream(ch) {
 
-  if (!currentStream || tokenExpired(currentStream)) {
+  if (!streams[ch] || tokenExpired(streams[ch])) {
 
     console.log("Token expired → refreshing");
 
-    await fetchNewToken();
+    await fetchNewToken(ch);
 
   }
 
-  return currentStream;
+  return streams[ch];
 
 }
-
 
 /* -----------------------
 PAGE
 ----------------------- */
 
 app.get("/", (req, res) => {
-  res.render("player");
-});
 
+  res.render("player");
+
+});
 
 /* -----------------------
 M3U8 PROXY
@@ -87,7 +104,9 @@ app.get("/stream.m3u8", async (req, res) => {
 
   try {
 
-    let url = await getStream();
+    let ch = req.query.ch || 1;
+
+    let url = await getStream(ch);
 
     let r = await axios.get(url, {
       headers: {
@@ -99,7 +118,7 @@ app.get("/stream.m3u8", async (req, res) => {
     let base = url.substring(0, url.lastIndexOf("/") + 1);
 
     let data = r.data.replace(/(.*\.ts)/g,
-      "/segment?file=$1&base=" + encodeURIComponent(base)
+      `/segment?file=$1&base=${encodeURIComponent(base)}`
     );
 
     res.set("content-type", "application/vnd.apple.mpegurl");
@@ -108,16 +127,17 @@ app.get("/stream.m3u8", async (req, res) => {
 
   } catch (e) {
 
-    console.log("Token expired, refreshing...");
+    console.log("Token expired refreshing");
 
-    await fetchNewToken();
+    let ch = req.query.ch || 1;
 
-    res.redirect("/stream.m3u8");
+    await fetchNewToken(ch);
+
+    res.redirect(`/stream.m3u8?ch=${ch}`);
 
   }
 
 });
-
 
 /* -----------------------
 TS SEGMENT PROXY
@@ -133,11 +153,14 @@ app.get("/segment", async (req, res) => {
     let url = base + file;
 
     let r = await axios.get(url, {
+
       responseType: "stream",
+
       headers: {
         Referer: "https://executeandship.com/",
         Origin: "https://executeandship.com"
       }
+
     });
 
     r.data.pipe(res);
@@ -152,9 +175,8 @@ app.get("/segment", async (req, res) => {
 
 });
 
-
 app.listen(3000, () => {
 
-  console.log("server running");
+  console.log("Server running on port 3000");
 
 });
