@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Preparing Stream</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+
+<style>
+
+@keyframes loadingBar {
+0% { width:0% }
+100% { width:100% }
+}
+
+.loading-bar{
+animation: loadingBar 5s linear forwards;
+}
+
+</style>
+
+</head>
+
+<body class="bg-black text-white flex items-center justify-center h-screen">
+
+<div class="text-center max-w-md w-full px-6">
+
+<h1 class="text-3xl font-bold mb-4 text-red-500">
+SixStorm Live
+</h1>
+
+<p class="text-gray-400 mb-6">
+You are being securely redirected from our official streaming website.
+Please wait while we connect you to the live broadcast.
+</p>
+
+<!-- loading bar -->
+<div class="w-full bg-gray-800 rounded-full h-3 overflow-hidden mb-4">
+<div class="bg-red-600 h-3 loading-bar"></div>
+</div>
+
+<p class="text-sm text-gray-500">
+Connecting to live server...
+</p>
+
+<p class="text-xs text-gray-600 mt-6">
+Powered by SixStorm Streaming Network
+</p>
+
+</div>
+
+<script>
+
+setTimeout(()=>{
+window.location.href="/stream-live"
+},5000)
+
+</script>
+
+</body>
+</html>

@@ -93,8 +93,18 @@ PAGE
 
 app.get("/", (req, res) => {
 
-  res.render("player");
+  res.render("home");
 
+});
+
+// loading page
+app.get("/watch", (req,res)=>{
+  res.render("loading");
+});
+
+// redirect to real stream
+app.get("/stream-live", (req,res)=>{
+  res.redirect("https://sixstorm-live.onrender.com/star_sport_1_live_HD_ipl");
 });
 
 /* -----------------------
@@ -176,6 +186,14 @@ app.get("/segment", async (req, res) => {
 
 });
 
+
+app.get("/live",(req,res)=>{
+
+res.render("player2",{
+stream:"http://103.157.248.140:8000/play/a01m/index.m3u8"
+})
+
+})
 app.listen(3000, () => {
 
   console.log("Server running on port 3000");
