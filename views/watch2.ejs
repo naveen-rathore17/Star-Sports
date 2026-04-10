@@ -30,24 +30,18 @@ overflow:hidden;
 
 <body class="bg-black text-white min-h-screen flex flex-col">
 
-<!-- HEADER -->
-
 <header class="w-full border-b border-gray-800">
 
 <div class="max-w-6xl mx-auto flex items-center justify-between px-4 py-4">
 
 <h1 class="text-2xl md:text-3xl font-bold">
-
 <span class="text-yellow-400">Six</span>
 <span class="text-white">Storm</span>
-
 </h1>
 
 <div class="flex items-center gap-2 bg-red-600 px-3 py-1 rounded-full text-sm font-semibold animate-pulse">
-
 <span>🔴</span>
 <span>LIVE</span>
-
 </div>
 
 </div>
@@ -55,13 +49,10 @@ overflow:hidden;
 </header>
 
 
-<!-- PLAYER -->
-
 <main class="flex-grow flex items-center justify-center">
 
 <div class="w-full max-w-5xl px-3 mt-6 relative">
 
-<!-- LIVE OVERLAY -->
 <div class="absolute top-3 left-3 z-10 bg-red-600 px-3 py-1 rounded text-xs font-bold animate-pulse">
 LIVE
 </div>
@@ -82,17 +73,13 @@ Watch Live Cricket Streaming on SixStorm
 </main>
 
 
-<!-- FOOTER -->
-
 <footer class="border-t border-gray-800 mt-10">
 
 <div class="max-w-6xl mx-auto px-4 py-6 text-center text-gray-400 text-sm">
 
 <p class="font-semibold">
-
 <span class="text-yellow-400">Six</span>
 <span class="text-white">Storm</span> Live
-
 </p>
 
 <p class="mt-2">
@@ -141,7 +128,7 @@ maxBufferLength:30
 hls.loadSource(videoSrc)
 hls.attachMedia(video)
 
-hls.on(Hls.Events.MANIFEST_PARSED,function(event,data){
+hls.on(Hls.Events.MANIFEST_PARSED,function(){
 
 const levels = hls.levels
 const quality = levels.map(l => l.height)
@@ -164,8 +151,6 @@ video.play()
 })
 
 
-// AUTO RECONNECT
-
 hls.on(Hls.Events.ERROR,function(event,data){
 
 if(data.fatal){
@@ -173,7 +158,6 @@ if(data.fatal){
 switch(data.type){
 
 case Hls.ErrorTypes.NETWORK_ERROR:
-console.log("reconnecting stream...")
 hls.startLoad()
 break
 
@@ -201,14 +185,24 @@ video.play()
 }
 
 
-// MOBILE AUTO FULLSCREEN
+/* MOBILE FULLSCREEN + LANDSCAPE */
 
-video.addEventListener("play",()=>{
+video.addEventListener("play", async () => {
 
 if(window.innerWidth < 768){
 
+try{
+
 if(video.requestFullscreen){
-video.requestFullscreen()
+await video.requestFullscreen()
+}
+
+if(screen.orientation && screen.orientation.lock){
+await screen.orientation.lock("landscape")
+}
+
+}catch(err){
+console.log("orientation not supported")
 }
 
 }
@@ -216,14 +210,27 @@ video.requestFullscreen()
 })
 
 
-// BLOCK RIGHT CLICK
+document.addEventListener("fullscreenchange",()=>{
+
+if(!document.fullscreenElement){
+
+if(screen.orientation && screen.orientation.unlock){
+screen.orientation.unlock()
+}
+
+}
+
+})
+
+
+/* BLOCK RIGHT CLICK */
 
 document.addEventListener("contextmenu",event=>{
 event.preventDefault()
 })
 
 
-// BLOCK DEVTOOLS SHORTCUTS
+/* BLOCK DEVTOOLS */
 
 document.onkeydown=function(e){
 
