@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+
+<title><%= title %></title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/hls.js@1"></script>
+
+</head>
+
+<body class="bg-black text-white min-h-screen flex flex-col">
+
+<!-- HEADER -->
+
+<header class="w-full border-b border-gray-800">
+
+<div class="max-w-6xl mx-auto flex items-center justify-between px-4 py-4">
+
+<h1 class="text-2xl md:text-3xl font-bold">
+
+<span class="text-yellow-400">Six</span>
+<span class="text-white">Storm</span>
+
+</h1>
+
+<div class="flex items-center gap-2 bg-red-600 px-3 py-1 rounded-full text-sm font-semibold animate-pulse">
+
+<span>🔴</span>
+<span>LIVE</span>
+
+</div>
+
+</div>
+
+</header>
+
+
+<!-- PLAYER SECTION -->
+
+<main class="flex-grow flex items-center justify-center">
+
+<div class="w-full max-w-5xl px-3 mt-6">
+
+<div class="bg-gray-900 rounded-xl shadow-2xl border border-gray-800 overflow-hidden">
+
+<video
+id="video"
+class="w-full aspect-video bg-black"
+controls
+autoplay
+muted
+playsinline
+webkit-playsinline
+></video>
+
+</div>
+
+<p class="text-center text-gray-400 text-sm mt-3">
+Watch Live Cricket Streaming on SixStorm
+</p>
+
+</div>
+
+</main>
+
+
+<!-- FOOTER -->
+
+<footer class="border-t border-gray-800 mt-10">
+
+<div class="max-w-6xl mx-auto px-4 py-6 text-center text-gray-400 text-sm">
+
+<p class="font-semibold">
+
+<span class="text-yellow-400">Six</span>
+<span class="text-white">Storm</span> Live
+
+</p>
+
+<p class="mt-2">
+Fast • Smooth • Mobile Friendly Streaming
+</p>
+
+<p class="mt-2 text-xs text-gray-500">
+© 2026 SixStorm Live. All Rights Reserved.
+</p>
+
+</div>
+
+</footer>
+
+
+<script>
+
+const video = document.getElementById("video")
+const videoSrc = "<%- streamUrl %>"
+
+if (video.canPlayType("application/vnd.apple.mpegurl")) {
+
+video.src = videoSrc
+
+} else if (Hls.isSupported()) {
+
+const hls = new Hls({
+liveDurationInfinity:true,
+enableWorker:true
+})
+
+hls.loadSource(videoSrc)
+hls.attachMedia(video)
+
+hls.on(Hls.Events.MANIFEST_PARSED,function(){
+video.play()
+})
+
+hls.on(Hls.Events.ERROR,function(event,data){
+
+if(data.fatal){
+
+switch(data.type){
+
+case Hls.ErrorTypes.NETWORK_ERROR:
+hls.startLoad()
+break
+
+case Hls.ErrorTypes.MEDIA_ERROR:
+hls.recoverMediaError()
+break
+
+default:
+hls.destroy()
+break
+
+}
+
+}
+
+})
+
+}
+
+</script>
+
+</body>
+</html>

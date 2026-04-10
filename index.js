@@ -185,6 +185,15 @@ app.get("/segment", async (req, res) => {
   }
 
 });
+app.get("/watch-ipl", (req, res) => {
+  const streamUrl = "https://muc002.myturn1.top:8088/live/webcrichindi/playlist.m3u8?vidictid=205534258389&id=119771&pk=79e3899a413e33bd1efbcd09d0df173a7466c907e5f9e0de621d8f6980f1723742af9682fa688effb9eb3c3c582b0f7d7e9bfe439ef06324ae33cfefd121eede";
+
+  res.render("watch", {
+    title: "SixStorm Live",
+    streamUrl
+    
+  });
+});
 
 
 app.get("/live",(req,res)=>{
